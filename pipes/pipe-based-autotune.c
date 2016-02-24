@@ -9,6 +9,7 @@ int main(int argc, char* argv[]) {
   FILE* input_file = fopen(input_filename, "r");
 
   int output_row_size = 128;
+  int half_output_row_size = output_row_size / 2;
   int row_size = 2048;
 
   int iq_byte_length = 8;
@@ -63,9 +64,16 @@ int main(int argc, char* argv[]) {
       }
     }
 
+    // check for the top-end boundary
     int min_write_index = signal_index;
     if(min_write_index + output_row_size >= row_size) {
       min_write_index = row_size - output_row_size;
+    }
+
+    // make sure the signal is in the middle
+    min_write_index -= half_output_row_size;
+    if(min_write_index < 0) {
+      min_write_index = 0;
     }
 
     for(int write_index = min_write_index; write_index < (min_write_index + output_row_size); write_index++) {
