@@ -1,0 +1,10 @@
+/home/mike/source/research/keeloq/gr-signalfinder/swig/CMakeFiles/signalfinder_swig_swig_2d0df.dir
+/home/mike/source/research/keeloq/gr-signalfinder/apps/CMakeFiles/pygen_apps_9a6dd.dir
+/home/mike/source/research/keeloq/gr-signalfinder/swig/CMakeFiles/_signalfinder_swig.dir
+/home/mike/source/research/keeloq/gr-signalfinder/CMakeFiles/uninstall.dir
+/home/mike/source/research/keeloq/gr-signalfinder/swig/CMakeFiles/_signalfinder_swig_swig_tag.dir
+/home/mike/source/research/keeloq/gr-signalfinder/swig/CMakeFiles/signalfinder_swig_swig_doc.dir
+/home/mike/source/research/keeloq/gr-signalfinder/lib/CMakeFiles/gnuradio-signalfinder.dir
+/home/mike/source/research/keeloq/gr-signalfinder/lib/CMakeFiles/test-signalfinder.dir
+/home/mike/source/research/keeloq/gr-signalfinder/python/CMakeFiles/pygen_python_44f46.dir
+/home/mike/source/research/keeloq/gr-signalfinder/swig/CMakeFiles/pygen_swig_13983.dir

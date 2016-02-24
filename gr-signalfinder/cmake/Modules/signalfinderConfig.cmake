@@ -1,0 +1,30 @@
+INCLUDE(FindPkgConfig)
+PKG_CHECK_MODULES(PC_SIGNALFINDER signalfinder)
+
+FIND_PATH(
+    SIGNALFINDER_INCLUDE_DIRS
+    NAMES signalfinder/api.h
+    HINTS $ENV{SIGNALFINDER_DIR}/include
+        ${PC_SIGNALFINDER_INCLUDEDIR}
+    PATHS ${CMAKE_INSTALL_PREFIX}/include
+          /usr/local/include
+          /usr/include
+)
+
+FIND_LIBRARY(
+    SIGNALFINDER_LIBRARIES
+    NAMES gnuradio-signalfinder
+    HINTS $ENV{SIGNALFINDER_DIR}/lib
+        ${PC_SIGNALFINDER_LIBDIR}
+    PATHS ${CMAKE_INSTALL_PREFIX}/lib
+          ${CMAKE_INSTALL_PREFIX}/lib64
+          /usr/local/lib
+          /usr/local/lib64
+          /usr/lib
+          /usr/lib64
+)
+
+INCLUDE(FindPackageHandleStandardArgs)
+FIND_PACKAGE_HANDLE_STANDARD_ARGS(SIGNALFINDER DEFAULT_MSG SIGNALFINDER_LIBRARIES SIGNALFINDER_INCLUDE_DIRS)
+MARK_AS_ADVANCED(SIGNALFINDER_LIBRARIES SIGNALFINDER_INCLUDE_DIRS)
+
