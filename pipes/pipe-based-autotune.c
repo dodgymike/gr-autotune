@@ -4,13 +4,15 @@
 int main(int argc, char* argv[]) {
   char* input_filename = argv[1];
   char* output_filename = argv[2];
+  int row_size = atoi(argv[3]);
+  int output_row_size = atoi(argv[4]);
 
   FILE* output_file = fopen(output_filename, "w");
   FILE* input_file = fopen(input_filename, "r");
 
-  int output_row_size = 128;
+  //int output_row_size = 8;
   int half_output_row_size = output_row_size / 2;
-  int row_size = 2048;
+  //int row_size = 512;
 
   int iq_byte_length = 8;
   char buffer[iq_byte_length];
@@ -19,11 +21,14 @@ int main(int argc, char* argv[]) {
   float row_i[row_size];
   float row_q[row_size];
 
-  char byte_swap_buff[4];
-
   int signal_index = 0;
   int signal_averaging_window_size = 5;
   int half_window_size = signal_averaging_window_size / 2;
+
+  int hold_count = 1000;
+  int current_hold_count = hold_count;
+
+  int min_write_index = 0;
 
   unsigned int row_count = 0;
   while(1) {
@@ -44,36 +49,40 @@ int main(int argc, char* argv[]) {
       row_i[row_index] = cur_i;
 
       char* q_float_data = (char*)&cur_q;
-      for(int i = 0; i < 4; i++) {
-        i_float_data[i] = buffer[i];
+      for(int i = 4; i < 8; i++) {
+        q_float_data[i] = buffer[i];
       }
       row_q[row_index] = cur_q;
     }
 
 /*
 */
-    float max_average = 0.0f;
-    for(int row_index = 0; row_index < (row_size - signal_averaging_window_size); row_index++) {
-      long sum = 0;
-      for(int averaging_window_index = 0; averaging_window_index < signal_averaging_window_size; averaging_window_index++) {
-        sum += row_i[row_index + averaging_window_index];
+    if(current_hold_count-- > 0) {
+      current_hold_count = hold_count;
+    } else {
+      float max_average = 0.0f;
+      for(int row_index = 0; row_index < (row_size - signal_averaging_window_size); row_index++) {
+        long sum = 0;
+        for(int averaging_window_index = 0; averaging_window_index < signal_averaging_window_size; averaging_window_index++) {
+          sum += row_i[row_index + averaging_window_index];
+        }
+        float average = sum / signal_averaging_window_size;
+        if(average > max_average) {
+          signal_index = row_index + half_window_size;
+        }
       }
-      float average = sum / signal_averaging_window_size;
-      if(average > max_average) {
-        signal_index = row_index + half_window_size;
+
+      // check for the top-end boundary
+      min_write_index = signal_index;
+      if(min_write_index + output_row_size >= row_size) {
+        min_write_index = row_size - output_row_size;
       }
-    }
 
-    // check for the top-end boundary
-    int min_write_index = signal_index;
-    if(min_write_index + output_row_size >= row_size) {
-      min_write_index = row_size - output_row_size;
-    }
-
-    // make sure the signal is in the middle
-    min_write_index -= half_output_row_size;
-    if(min_write_index < 0) {
-      min_write_index = 0;
+      // make sure the signal is in the middle
+      min_write_index -= half_output_row_size;
+      if(min_write_index < 0) {
+        min_write_index = 0;
+      }
     }
 
     for(int write_index = min_write_index; write_index < (min_write_index + output_row_size); write_index++) {
@@ -83,13 +92,6 @@ int main(int argc, char* argv[]) {
       char* write_q = (char*)&(row_q[write_index]);
       fwrite(write_q, 4, 1, output_file);
     }
-/*
-    for(int write_index = 0; write_index < output_row_size; write_index++) {
-      char* write_mag = (char*)&(row_i[write_index]);
-
-      fwrite(write_mag, 4, 1, output_file);
-    }
-*/
   }
 }
 
