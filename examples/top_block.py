@@ -2,7 +2,7 @@
 ##################################################
 # GNU Radio Python Flow Graph
 # Title: Top Block
-# Generated: Wed Feb 24 07:52:35 2016
+# Generated: Wed Feb 24 15:07:57 2016
 ##################################################
 
 if __name__ == '__main__':
@@ -15,10 +15,10 @@ if __name__ == '__main__':
         except:
             print "Warning: failed to XInitThreads()"
 
-from gnuradio import analog
 from gnuradio import blocks
 from gnuradio import eng_notation
 from gnuradio import fft
+from gnuradio import filter
 from gnuradio import gr
 from gnuradio import wxgui
 from gnuradio.eng_option import eng_option
@@ -45,7 +45,7 @@ class top_block(grc_wxgui.top_block_gui):
         # Variables
         ##################################################
         self.var_sample_rate = var_sample_rate = 2500000
-        self.var_reverse_fft_size = var_reverse_fft_size = 128
+        self.var_reverse_fft_size = var_reverse_fft_size = 32
         self.var_freq = var_freq = 433000000
         self.var_fft_size = var_fft_size = 2048
 
@@ -133,20 +133,20 @@ class top_block(grc_wxgui.top_block_gui):
         	win=window.hanning,
         )
         self.notebook_0.GetPage(0).GridAdd(self.wxgui_waterfallsink2_0.win, 0, 0, 1, 1)
-        self.wxgui_scopesink2_1 = scopesink2.scope_sink_f(
+        self.wxgui_scopesink2_1_0 = scopesink2.scope_sink_f(
         	self.GetWin(),
-        	title="After AM Demod",
+        	title="After C2M2",
         	sample_rate=var_sample_rate*var_reverse_fft_size/var_fft_size,
-        	v_scale=0,
+        	v_scale=20,
         	v_offset=0,
-        	t_scale=0,
-        	ac_couple=False,
+        	t_scale=1,
+        	ac_couple=True,
         	xy_mode=False,
         	num_inputs=1,
-        	trig_mode=wxgui.TRIG_MODE_AUTO,
-        	y_axis_label="Counts",
+        	trig_mode=wxgui.TRIG_MODE_NORM,
+        	y_axis_label="Amplitude",
         )
-        self.Add(self.wxgui_scopesink2_1.win)
+        self.Add(self.wxgui_scopesink2_1_0.win)
         self.osmosdr_source_0 = osmosdr.source( args="numchan=" + str(1) + " " + "hackrf=0" )
         self.osmosdr_source_0.set_sample_rate(var_sample_rate)
         self.osmosdr_source_0.set_center_freq(var_freq, 0)
@@ -162,32 +162,29 @@ class top_block(grc_wxgui.top_block_gui):
           
         self.fft_vxx_1_0 = fft.fft_vcc(var_reverse_fft_size, False, (), True, 4)
         self.fft_vxx_0 = fft.fft_vcc(var_fft_size, True, (), False, 4)
+        self.dc_blocker_xx_0 = filter.dc_blocker_cc(32, True)
         self.blocks_vector_to_stream_1_0 = blocks.vector_to_stream(gr.sizeof_gr_complex*1, var_reverse_fft_size)
         self.blocks_stream_to_vector_2 = blocks.stream_to_vector(gr.sizeof_gr_complex*1, var_reverse_fft_size)
         self.blocks_stream_to_vector_0 = blocks.stream_to_vector(gr.sizeof_gr_complex*1, var_fft_size)
         self.blocks_file_source_0 = blocks.file_source(gr.sizeof_gr_complex*1, "/home/mike/source/gr-autotune/examples/to-grc.fifo", False)
         self.blocks_file_sink_2 = blocks.file_sink(gr.sizeof_gr_complex*var_fft_size, "/home/mike/source/gr-autotune/examples/from-grc.fifo", True)
         self.blocks_file_sink_2.set_unbuffered(False)
-        self.analog_am_demod_cf_0 = analog.am_demod_cf(
-        	channel_rate=var_sample_rate*var_reverse_fft_size/var_fft_size,
-        	audio_decim=1,
-        	audio_pass=40000,
-        	audio_stop=44000,
-        )
+        self.blocks_complex_to_mag_squared_0 = blocks.complex_to_mag_squared(1)
 
         ##################################################
         # Connections
         ##################################################
-        self.connect((self.analog_am_demod_cf_0, 0), (self.wxgui_scopesink2_1, 0))    
+        self.connect((self.blocks_complex_to_mag_squared_0, 0), (self.wxgui_scopesink2_1_0, 0))    
         self.connect((self.blocks_file_source_0, 0), (self.blocks_stream_to_vector_2, 0))    
         self.connect((self.blocks_stream_to_vector_0, 0), (self.fft_vxx_0, 0))    
         self.connect((self.blocks_stream_to_vector_2, 0), (self.fft_vxx_1_0, 0))    
-        self.connect((self.blocks_vector_to_stream_1_0, 0), (self.analog_am_demod_cf_0, 0))    
+        self.connect((self.blocks_vector_to_stream_1_0, 0), (self.blocks_complex_to_mag_squared_0, 0))    
         self.connect((self.blocks_vector_to_stream_1_0, 0), (self.wxgui_waterfallsink2_1_0_0, 0))    
+        self.connect((self.dc_blocker_xx_0, 0), (self.blocks_stream_to_vector_0, 0))    
+        self.connect((self.dc_blocker_xx_0, 0), (self.wxgui_waterfallsink2_0, 0))    
         self.connect((self.fft_vxx_0, 0), (self.blocks_file_sink_2, 0))    
         self.connect((self.fft_vxx_1_0, 0), (self.blocks_vector_to_stream_1_0, 0))    
-        self.connect((self.osmosdr_source_0, 0), (self.blocks_stream_to_vector_0, 0))    
-        self.connect((self.osmosdr_source_0, 0), (self.wxgui_waterfallsink2_0, 0))    
+        self.connect((self.osmosdr_source_0, 0), (self.dc_blocker_xx_0, 0))    
 
 
     def get_var_sample_rate(self):
@@ -198,7 +195,7 @@ class top_block(grc_wxgui.top_block_gui):
         self._var_sample_rate_slider.set_value(self.var_sample_rate)
         self._var_sample_rate_text_box.set_value(self.var_sample_rate)
         self.osmosdr_source_0.set_sample_rate(self.var_sample_rate)
-        self.wxgui_scopesink2_1.set_sample_rate(self.var_sample_rate*self.var_reverse_fft_size/self.var_fft_size)
+        self.wxgui_scopesink2_1_0.set_sample_rate(self.var_sample_rate*self.var_reverse_fft_size/self.var_fft_size)
         self.wxgui_waterfallsink2_0.set_sample_rate(self.var_sample_rate)
         self.wxgui_waterfallsink2_1_0_0.set_sample_rate(self.var_sample_rate*self.var_reverse_fft_size/self.var_fft_size)
 
@@ -208,7 +205,7 @@ class top_block(grc_wxgui.top_block_gui):
     def set_var_reverse_fft_size(self, var_reverse_fft_size):
         self.var_reverse_fft_size = var_reverse_fft_size
         self._var_reverse_fft_size_text_box.set_value(self.var_reverse_fft_size)
-        self.wxgui_scopesink2_1.set_sample_rate(self.var_sample_rate*self.var_reverse_fft_size/self.var_fft_size)
+        self.wxgui_scopesink2_1_0.set_sample_rate(self.var_sample_rate*self.var_reverse_fft_size/self.var_fft_size)
         self.wxgui_waterfallsink2_1_0_0.set_sample_rate(self.var_sample_rate*self.var_reverse_fft_size/self.var_fft_size)
 
     def get_var_freq(self):
@@ -226,7 +223,7 @@ class top_block(grc_wxgui.top_block_gui):
     def set_var_fft_size(self, var_fft_size):
         self.var_fft_size = var_fft_size
         self._var_fft_size_text_box.set_value(self.var_fft_size)
-        self.wxgui_scopesink2_1.set_sample_rate(self.var_sample_rate*self.var_reverse_fft_size/self.var_fft_size)
+        self.wxgui_scopesink2_1_0.set_sample_rate(self.var_sample_rate*self.var_reverse_fft_size/self.var_fft_size)
         self.wxgui_waterfallsink2_1_0_0.set_sample_rate(self.var_sample_rate*self.var_reverse_fft_size/self.var_fft_size)
 
 
