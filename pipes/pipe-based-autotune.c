@@ -1,6 +1,41 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+void float_to_buf(float in, unsigned char* buf) {
+  unsigned char* in_bytes = (unsigned char*)&in;
+  for(int i = 0; i < 4; i++) {
+    buf[i] = in_bytes[i];
+  }
+}
+
+float buf_to_float(unsigned char* buf) {
+  float out = 0.0f;
+
+  unsigned char* out_bytes = (unsigned char*)&out;
+  for(int i = 0; i < 4; i++) {
+    out_bytes[i] = buf[i];
+  }
+
+  return out;
+}
+
+int find_output_start_index(int signal_index, int output_row_size, int row_size, int half_output_row_size) {
+  int output_start_index = signal_index;
+
+  // check for the top-end boundary
+  if(output_start_index + output_row_size >= row_size) {
+    output_start_index = row_size - output_row_size - 1;
+  }
+
+  // make sure the signal is in the middle
+  output_start_index -= half_output_row_size;
+  if(output_start_index < 0) {
+    output_start_index = 0;
+  }
+
+  return output_start_index;
+}
+
 int main(int argc, char* argv[]) {
   char* input_filename = argv[1];
   char* output_filename = argv[2];
@@ -14,83 +49,53 @@ int main(int argc, char* argv[]) {
   int half_output_row_size = output_row_size / 2;
   //int row_size = 512;
 
-  int iq_byte_length = 8;
-  char buffer[iq_byte_length];
+  unsigned char buffer[4];
   float cur_i = 0.0f;
   float cur_q = 0.0f;
   float row_i[row_size];
   float row_q[row_size];
 
   int signal_index = 0;
-  int signal_averaging_window_size = 5;
+  int signal_averaging_window_size = output_row_size / 10;
   int half_window_size = signal_averaging_window_size / 2;
 
-  int hold_count = 1000;
-  int current_hold_count = hold_count;
+/*
+  float row_sums[row_size];
+  int row_counts[row_size];
+  int row_average_window_size;
+*/
 
-  int min_write_index = 0;
-
-  unsigned int row_count = 0;
   while(1) {
-    row_count++;
-/*
-    if(row_count % 1000 == 0) {
-      printf("row_count (%u) signal_index (%d)\n", row_count, signal_index);
-    }
-*/
-
-
     for(int row_index = 0; row_index < row_size; row_index++) {
-      fread(&buffer, iq_byte_length, 1, input_file);
-      char* i_float_data = (char*)&cur_i;
-      for(int i = 0; i < 4; i++) {
-        i_float_data[i] = buffer[i];
-      }
-      row_i[row_index] = cur_i;
-
-      char* q_float_data = (char*)&cur_q;
-      for(int i = 4; i < 8; i++) {
-        q_float_data[i] = buffer[i];
-      }
-      row_q[row_index] = cur_q;
+      fread(&buffer, 4, 1, input_file);
+      row_i[row_index] = buf_to_float(buffer);
+      fread(&buffer, 4, 1, input_file);
+      row_q[row_index] = buf_to_float(buffer);
     }
 
-/*
-*/
-    if(current_hold_count-- > 0) {
-      current_hold_count = hold_count;
-    } else {
       float max_average = 0.0f;
       for(int row_index = 0; row_index < (row_size - signal_averaging_window_size); row_index++) {
         long sum = 0;
         for(int averaging_window_index = 0; averaging_window_index < signal_averaging_window_size; averaging_window_index++) {
-          sum += row_i[row_index + averaging_window_index];
+          sum += abs(row_i[row_index + averaging_window_index]);
         }
         float average = sum / signal_averaging_window_size;
         if(average > max_average) {
           signal_index = row_index + half_window_size;
+          max_average = average;
         }
       }
 
-      // check for the top-end boundary
-      min_write_index = signal_index;
-      if(min_write_index + output_row_size >= row_size) {
-        min_write_index = row_size - output_row_size;
-      }
+    // HARD CODED
+    //output_start_index = 6582;
+    int output_start_index = find_output_start_index(signal_index, output_row_size, row_size, half_output_row_size);
 
-      // make sure the signal is in the middle
-      min_write_index -= half_output_row_size;
-      if(min_write_index < 0) {
-        min_write_index = 0;
-      }
-    }
+    for(int write_index = output_start_index; write_index < (output_start_index + output_row_size); write_index++) {
+      float_to_buf(row_i[write_index], buffer);
+      fwrite(buffer, 4, 1, output_file);
 
-    for(int write_index = min_write_index; write_index < (min_write_index + output_row_size); write_index++) {
-      char* write_i = (char*)&(row_i[write_index]);
-      fwrite(write_i, 4, 1, output_file);
-
-      char* write_q = (char*)&(row_q[write_index]);
-      fwrite(write_q, 4, 1, output_file);
+      float_to_buf(row_q[write_index], buffer);
+      fwrite(buffer, 4, 1, output_file);
     }
   }
 }
