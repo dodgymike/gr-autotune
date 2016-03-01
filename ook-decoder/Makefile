@@ -2,7 +2,7 @@
 CXX=gcc
 COMPILER_FLAGS= -g
 INCLUDE= 
-LIBS=
+LIBS=-lpthread
 
 EXEC= ook-decoder
 
