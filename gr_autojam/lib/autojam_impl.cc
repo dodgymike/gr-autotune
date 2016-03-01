@@ -48,6 +48,8 @@ namespace gr {
       d_zero_count = 0;
       d_max_symbol_bits = 256;
       d_symbol_index = 0;
+
+      d_jam = 0;
     }
 
     /*
@@ -77,28 +79,30 @@ namespace gr {
             d_symbol_index = 0;
           }
 
-//          printf("one count (%d) zero count (%d) on/off ratio (%f) symbol index (%d)\n", d_one_count, d_zero_count, on_off_ratio, d_symbol_index);
           d_symbol_bits[d_symbol_index++] = on_off;
 
           d_one_count = 0;
           d_zero_count = 0;
         }
 
-/*
-        if(d_zero_count % 1000 == 0) {
-            printf("one count (%d) zero count (%d) symbol index (%d)\n", d_one_count, d_zero_count, d_symbol_index);
-        }
-*/
-
         if(!cur_bit) {
           if(d_one_count + d_zero_count > 2) {
-            if(d_zero_count > (d_one_count * 10)) {
+            if(d_zero_count > (d_one_count * 4)) {
               if(d_symbol_index > 1) {
                 printf("got a code: ");
                 for(int i = 0; i < d_symbol_index; i++) {
                   printf("%d", d_symbol_bits[i]);
                 }
                 printf("\n");
+
+                if(d_symbol_index == 12) {
+                  printf("JAM TIME!\n");
+                  d_jam = 1;
+                } else {
+                  printf("NO MORE JAM TIME!\n");
+                  d_jam = 0;
+                }
+
                 d_symbol_index = 0;
                 d_one_count = 0;
                 d_zero_count = 0;
@@ -115,7 +119,7 @@ namespace gr {
 
         d_last_bit = cur_bit;
 
-        out[i] = 1;
+        out[i] = d_jam;
       }
 
       // Tell runtime system how many output items we produced.

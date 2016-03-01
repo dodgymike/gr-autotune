@@ -34,6 +34,7 @@ namespace gr {
        int d_max_symbol_bits;
        int d_symbol_bits[1024];
        int d_symbol_index;
+       int d_jam;
 
        unsigned char d_last_bit;
 
