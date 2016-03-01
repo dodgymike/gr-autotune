@@ -1,0 +1,13 @@
+# Hashes of file build rules.
+88ca976e2152bf505b300fc4ef7fc931 CMakeFiles/uninstall
+0af50bbd7ab362f1ce6bf0a58f1c8209 python/CMakeFiles/pygen_python_c53fa
+62803bc150e8b73fff2368dc30d48672 python/__init__.pyc
+76f375f03313f3babdcce5f6d6d91e8f python/__init__.pyo
+421758d2745c9d0f81e90632806e9f0d swig/CMakeFiles/autojam_swig_swig_doc
+421758d2745c9d0f81e90632806e9f0d swig/CMakeFiles/pygen_swig_e86ca
+421758d2745c9d0f81e90632806e9f0d swig/autojam_swig.py
+01452a9e0787f0a32fc5d667ff3026f8 swig/autojam_swig.pyc
+6a3dc86348e2dfd880e709f4e2c0bec9 swig/autojam_swig.pyo
+301b33db7d363ebca0d690d57ce6c6d6 swig/autojam_swig.tag
+421758d2745c9d0f81e90632806e9f0d swig/autojam_swigPYTHON_wrap.cxx
+71d52a567d5954d3990748c4800ef3bd swig/autojam_swig_swig_2d0df.cpp

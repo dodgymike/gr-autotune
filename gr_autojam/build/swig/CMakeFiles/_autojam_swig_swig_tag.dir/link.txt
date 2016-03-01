@@ -1,0 +1,1 @@
+/usr/bin/c++   -O3 -DNDEBUG   CMakeFiles/_autojam_swig_swig_tag.dir/_autojam_swig_swig_tag.cpp.o  -o _autojam_swig_swig_tag -rdynamic 

@@ -7,6 +7,8 @@
 #include <fcntl.h>
 
 #include <pthread.h>
+#include <sys/select.h>
+
 
 float jam_data() {
   float rand_data = rand();
@@ -55,27 +57,29 @@ void* jam_loop(void* arg) {
   int* jam_on = args->jam_on;
   pthread_mutex_t* jam_lock = args->jam_lock;
 
+// int select(int nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, struct timeval *timeout);
+
+  int loop_counter = 0;
+
   int local_jam_on = 0;
+  fd_set write_fds;
   while(1) {
-      pthread_mutex_lock(jam_lock);
-        int local_jam_on = *jam_on;
-      pthread_mutex_unlock(jam_lock);
-/*
-      if(local_jam_on) {
-        printf("JAM LOOP JAMMING\n");
-      }
-*/
+    if(loop_counter++ % 50000 == 0) {
+      printf("loop_counter (%d)\n", loop_counter);
+    }
+    //printf("STARTING JAM LOOP\n");
+
+    FD_ZERO(&write_fds);
+    FD_SET(jam_file, &write_fds);
+    select(jam_file + 1, NULL, &write_fds, NULL, NULL);
+
+    //printf("JAM LOOP\n");
+
+    pthread_mutex_lock(jam_lock);
+      int local_jam_on = *jam_on;
+    pthread_mutex_unlock(jam_lock);
 
     jam(local_jam_on, jam_file);
-
-/*
-      for(int i = 0; i < 250000; i++) {
-        jam(1, jam_file);
-      }
-      for(int i = 0; i < 250000; i++) {
-        jam(0, jam_file);
-      }
-*/  
   }
 }
 
@@ -213,7 +217,7 @@ int main(int argc, char* argv[]) {
   char* jam_filename = argv[2];
   float raw_bit_rate = atoi(argv[3]);
 
-  int jam_file = open(jam_filename, O_WRONLY);
+  int jam_file = open(jam_filename, O_RDWR | O_SYNC);
   int ook_file = open(input_filename, O_RDONLY);
 
   pthread_mutex_t jam_lock;

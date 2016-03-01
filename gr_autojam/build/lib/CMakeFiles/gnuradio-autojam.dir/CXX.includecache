@@ -1,0 +1,30 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+../include/autojam/api.h
+gnuradio/attributes.h
+-
+
+../include/autojam/autojam.h
+autojam/api.h
+-
+gnuradio/sync_block.h
+-
+
+/home/mike/source/gr-autotune/gr_autojam/lib/autojam_impl.cc
+config.h
+/home/mike/source/gr-autotune/gr_autojam/lib/config.h
+gnuradio/io_signature.h
+-
+autojam_impl.h
+/home/mike/source/gr-autotune/gr_autojam/lib/autojam_impl.h
+
+/home/mike/source/gr-autotune/gr_autojam/lib/autojam_impl.h
+autojam/autojam.h
+-
+

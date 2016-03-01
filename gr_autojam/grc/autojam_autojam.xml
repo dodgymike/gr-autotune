@@ -1,0 +1,20 @@
+<block>
+  <name>Autojam</name>
+  <key>autojam_autojam</key>
+  <category>AUTOJAM</category>
+  <import>import autojam</import>
+  <make>autojam.autojam($decimation)</make>
+  <param>
+    <name>Decimation</name>
+    <key>decimation</key>
+    <type>int</type>
+  </param>
+  <sink>
+    <name>in</name>
+    <type>byte</type>
+  </sink>
+  <source>
+    <name>out</name>
+    <type>byte</type>
+  </source>
+</block>
