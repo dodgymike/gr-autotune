@@ -2,6 +2,10 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+
 #include <pthread.h>
 
 float jam_data() {
@@ -20,21 +24,26 @@ void float_to_buf(float in, unsigned char* buf) {
   }
 }
 
-void jam(int jam_on, FILE* jam_file) {
+void jam(int jam_on, int jam_file) {
   unsigned char buf[4];
 
   float jam_i = jam_on ? jam_data() : 0x0000;
   float_to_buf(jam_i, buf);
-  fwrite(buf, 4, 1, jam_file);
+  //fwrite(buf, 4, 1, jam_file);
+  //ssize_t write(int fd, const void *buf, size_t count);
+  write(jam_file, buf, 4);
+
   float jam_q = jam_on ? jam_data() : 0x0000;
   float_to_buf(jam_q, buf);
-  fwrite(buf, 4, 1, jam_file);
+  //fwrite(buf, 4, 1, jam_file);
+  //ssize_t write(int fd, const void *buf, size_t count);
+  write(jam_file, buf, 4);
 
 //  fflush(jam_file);
 }
 
 struct jam_args {
-  FILE* jam_file;
+  int jam_file;
   int* jam_on;
   pthread_mutex_t* jam_lock;
 };
@@ -42,7 +51,7 @@ struct jam_args {
 void* jam_loop(void* arg) {
   struct jam_args* args = (struct jam_args*)arg;
 
-  FILE* jam_file = args->jam_file;
+  int jam_file = args->jam_file;
   int* jam_on = args->jam_on;
   pthread_mutex_t* jam_lock = args->jam_lock;
 
@@ -71,7 +80,7 @@ void* jam_loop(void* arg) {
 }
 
 struct ook_args {
-  FILE* ook_file;
+  int ook_file;
   float* raw_bit_rate;
   int* jam_on;
   pthread_mutex_t* jam_lock;
@@ -80,7 +89,7 @@ struct ook_args {
 void* ook_loop(void* arg) {
   struct ook_args* args = (struct ook_args*)arg;
 
-  FILE* ook_file = args->ook_file;
+  int ook_file = args->ook_file;
   float raw_bit_rate = *(args->raw_bit_rate);
   int* jam_on = args->jam_on;
   pthread_mutex_t* jam_lock = args->jam_lock;
@@ -100,7 +109,9 @@ void* ook_loop(void* arg) {
   while(1) {
     int one_count = 0;
     while(cur_bit == 1) {
-      fread(&cur_bit, 1, 1, ook_file);
+      // ssize_t read(int fd, void *buf, size_t count);
+      read(ook_file, &cur_bit, 1);
+      //fread(&cur_bit, 1, 1, ook_file);
       one_count++;
         pthread_mutex_lock(jam_lock);
         if(*jam_on > 0) {
@@ -147,7 +158,8 @@ void* ook_loop(void* arg) {
         break;
       }
 
-      fread(&cur_bit, 1, 1, ook_file);
+      read(ook_file, &cur_bit, 1);
+      //fread(&cur_bit, 1, 1, ook_file);
       zero_count++;
         pthread_mutex_lock(jam_lock);
         if(*jam_on > 0) {
@@ -201,8 +213,8 @@ int main(int argc, char* argv[]) {
   char* jam_filename = argv[2];
   float raw_bit_rate = atoi(argv[3]);
 
-  FILE* jam_file = fopen(jam_filename, "w");
-  FILE* ook_file = fopen(input_filename, "r");
+  int jam_file = open(jam_filename, O_WRONLY);
+  int ook_file = open(input_filename, O_RDONLY);
 
   pthread_mutex_t jam_lock;
   pthread_mutex_init(&jam_lock, NULL);
