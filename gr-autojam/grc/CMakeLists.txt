@@ -18,5 +18,6 @@
 # Boston, MA 02110-1301, USA.
 
 install(FILES
-    autojam_autojam.xml DESTINATION share/gnuradio/grc/blocks
+    autojam_autojam.xml
+    autojam_autotune.xml DESTINATION share/gnuradio/grc/blocks
 )

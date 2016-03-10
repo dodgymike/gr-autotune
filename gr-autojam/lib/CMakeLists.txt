@@ -27,6 +27,7 @@ link_directories(${Boost_LIBRARY_DIRS})
 
 list(APPEND autojam_sources
     autojam_impl.cc
+    autotune_impl.cc
 )
 
 set(autojam_sources "${autojam_sources}" PARENT_SCOPE)

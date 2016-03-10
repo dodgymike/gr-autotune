@@ -22,5 +22,6 @@
 ########################################################################
 install(FILES
     api.h
-    autojam.h DESTINATION include/autojam
+    autojam.h
+    autotune.h DESTINATION include/autojam
 )

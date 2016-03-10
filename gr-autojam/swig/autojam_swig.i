@@ -9,8 +9,11 @@
 
 %{
 #include "autojam/autojam.h"
+#include "autojam/autotune.h"
 %}
 
 
 %include "autojam/autojam.h"
 GR_SWIG_BLOCK_MAGIC2(autojam, autojam);
+%include "autojam/autotune.h"
+GR_SWIG_BLOCK_MAGIC2(autojam, autotune);
