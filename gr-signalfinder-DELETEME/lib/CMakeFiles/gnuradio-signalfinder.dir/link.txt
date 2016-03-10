@@ -1,1 +1,0 @@
-/usr/bin/c++  -fPIC -O3 -DNDEBUG  -shared -Wl,-soname,libgnuradio-signalfinder.so -o libgnuradio-signalfinder.so CMakeFiles/gnuradio-signalfinder.dir/signalfinder_impl.cc.o -lboost_filesystem -lboost_system -lgnuradio-runtime -lgnuradio-pmt 
