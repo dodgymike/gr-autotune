@@ -22,5 +22,5 @@
 ########################################################################
 install(FILES
     api.h
-    signalfinder.h DESTINATION include/signalfinder
+    autotune.h DESTINATION include/signalfinder
 )

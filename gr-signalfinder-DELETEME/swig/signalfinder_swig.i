@@ -8,9 +8,6 @@
 %include "signalfinder_swig_doc.i"
 
 %{
-#include "signalfinder/autotune.h"
 %}
 
 
-%include "signalfinder/autotune.h"
-GR_SWIG_BLOCK_MAGIC2(signalfinder, autotune);

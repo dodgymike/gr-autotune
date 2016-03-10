@@ -1,0 +1,32 @@
+<block>
+  <name>Autotune</name>
+  <key>signalfinder_autotune</key>
+  <category>SIGNALFINDER</category>
+  <import>import signalfinder</import>
+  <make>signalfinder.autotune($sample_rate, $fft_size, $output_size)</make>
+  <param>
+    <name>Sample_rate</name>
+    <key>sample_rate</key>
+    <type>int</type>
+  </param>
+  <param>
+    <name>Fft_size</name>
+    <key>fft_size</key>
+    <type>int</type>
+  </param>
+  <param>
+    <name>Output_size</name>
+    <key>output_size</key>
+    <type>int</type>
+  </param>
+  <sink>
+    <name>in</name>
+    <type>complex</type>
+    <vlen>$fft_size</vlen>
+  </sink>
+  <source>
+    <name>out</name>
+    <type>complex</type>
+    <vlen>$output_size</vlen>
+  </source>
+</block>

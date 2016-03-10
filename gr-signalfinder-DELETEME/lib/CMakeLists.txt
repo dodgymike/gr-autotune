@@ -26,7 +26,7 @@ include_directories(${Boost_INCLUDE_DIR})
 link_directories(${Boost_LIBRARY_DIRS})
 
 list(APPEND signalfinder_sources
-    autotune_impl.cc
+    signalfinder_impl.cc
 )
 
 set(signalfinder_sources "${signalfinder_sources}" PARENT_SCOPE)
