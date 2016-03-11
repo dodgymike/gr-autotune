@@ -25,8 +25,10 @@
 #include <gnuradio/io_signature.h>
 #include "autotune_impl.h"
 
+#include <iostream>
+
 namespace gr {
-  namespace signalfinder {
+  namespace autojam {
 
     autotune::sptr autotune::make(int sample_rate, int fft_size, int output_size)
     {
@@ -57,8 +59,9 @@ namespace gr {
 			  gr_vector_const_void_star &input_items,
 			  gr_vector_void_star &output_items)
     {
-//        const gr_complex *in = (const gr_complex *) input_items[0];
-//        gr_complex *out = (gr_complex *) output_items[0];
+        const gr_complex *in = (const gr_complex *) input_items[0];
+        gr_complex *out = (gr_complex *) output_items[0];
+
 
 	int signal_index = 0;
 	int signal_averaging_window_size = m_output_size / 10;
@@ -70,8 +73,8 @@ namespace gr {
         for(int row_index = 0; row_index < (m_fft_size - signal_averaging_window_size); row_index++) {
           long sum = 0;
           for(int averaging_window_index = 0; averaging_window_index < signal_averaging_window_size; averaging_window_index++) {
-            gr_complex* input_item = (gr_complex*)input_items[row_index + averaging_window_index];
-            sum += abs(input_item->real());
+            gr_complex input_item = in[row_index + averaging_window_index];
+            sum += abs(input_item.real());
           }
           float average = sum / signal_averaging_window_size;
           if(average > max_average) {
@@ -84,11 +87,14 @@ namespace gr {
 
         int output_index = 0;
         for(int write_index = output_start_index; write_index < (output_start_index + m_output_size); write_index++) {
-          *(gr_complex*)output_items[output_index] = *(gr_complex*)input_items[write_index];
+          //*(gr_complex*)(output_items[output_index++]) = *(gr_complex*)(in[write_index]);
+          out[output_index++] = in[write_index];
         }
+/*
         for(; output_index < m_output_size; output_index++) {
           *(gr_complex*)output_items[output_index] = gr_complex(0,0);
         }
+*/
 
         // Tell runtime system how many output items we produced.
         return noutput_items;
@@ -111,6 +117,6 @@ namespace gr {
       return output_start_index;
     }
 
-  } /* namespace signalfinder */
+  } /* namespace autojam */
 } /* namespace gr */
 

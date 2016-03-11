@@ -19,38 +19,38 @@
  */
 
 
-#ifndef INCLUDED_SIGNALFINDER_AUTOTUNE_H
-#define INCLUDED_SIGNALFINDER_AUTOTUNE_H
+#ifndef INCLUDED_AUTOJAM_AUTOTUNE_H
+#define INCLUDED_AUTOJAM_AUTOTUNE_H
 
-#include <signalfinder/api.h>
+#include <autojam/api.h>
 #include <gnuradio/sync_block.h>
 
 namespace gr {
-  namespace signalfinder {
+  namespace autojam {
 
     /*!
      * \brief <+description of block+>
-     * \ingroup signalfinder
+     * \ingroup autojam
      *
      */
-    class SIGNALFINDER_API autotune : virtual public gr::sync_block
+    class AUTOJAM_API autotune : virtual public gr::sync_block
     {
      public:
       typedef boost::shared_ptr<autotune> sptr;
 
       /*!
-       * \brief Return a shared_ptr to a new instance of signalfinder::autotune.
+       * \brief Return a shared_ptr to a new instance of autojam::autotune.
        *
-       * To avoid accidental use of raw pointers, signalfinder::autotune's
+       * To avoid accidental use of raw pointers, autojam::autotune's
        * constructor is in a private implementation
-       * class. signalfinder::autotune::make is the public interface for
+       * class. autojam::autotune::make is the public interface for
        * creating new instances.
        */
       static sptr make(int sample_rate, int fft_size, int output_size);
     };
 
-  } // namespace signalfinder
+  } // namespace autojam
 } // namespace gr
 
-#endif /* INCLUDED_SIGNALFINDER_AUTOTUNE_H */
+#endif /* INCLUDED_AUTOJAM_AUTOTUNE_H */
 

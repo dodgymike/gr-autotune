@@ -18,13 +18,13 @@
  * Boston, MA 02110-1301, USA.
  */
 
-#ifndef INCLUDED_SIGNALFINDER_AUTOTUNE_IMPL_H
-#define INCLUDED_SIGNALFINDER_AUTOTUNE_IMPL_H
+#ifndef INCLUDED_AUTOJAM_AUTOTUNE_IMPL_H
+#define INCLUDED_AUTOJAM_AUTOTUNE_IMPL_H
 
-#include <signalfinder/autotune.h>
+#include <autojam/autotune.h>
 
 namespace gr {
-  namespace signalfinder {
+  namespace autojam {
 
     class autotune_impl : public autotune
     {
@@ -45,8 +45,8 @@ namespace gr {
 	       gr_vector_void_star &output_items);
     };
 
-  } // namespace signalfinder
+  } // namespace autojam
 } // namespace gr
 
-#endif /* INCLUDED_SIGNALFINDER_AUTOTUNE_IMPL_H */
+#endif /* INCLUDED_AUTOJAM_AUTOTUNE_IMPL_H */
 
